@@ -1,0 +1,43 @@
+const passport = require("passport");
+const LocalStrategy = require("passport-local").Strategy;
+const User = require("../../model/user/User");
+
+passport.serializeUser((user, done) => {
+  done(null, user._id);
+});
+
+passport.deserializeUser((id, done) => {
+  User.findById(id, (err, user) => {
+    done(err, user);
+  });
+});
+
+passport.use(
+  new LocalStrategy(
+    {
+      usernameField: "email",
+    },
+    (email, password, done) => {
+      User.findOne({ email: email }, (err, user) => {
+        if (err) {
+          return done(err);
+        }
+        if (!user) {
+          return done(null, false, { message: "Incorrect email" });
+        }
+        if (!user.isValidPassword(password)) {
+          return done(null, false, { message: "Incorrect password" });
+        }
+        return done(null, user);
+      });
+    }
+  )
+);
+
+exports.isAuthenticated = (req, res, next) => {
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  res.status(401).json({ message: "Unauthorized" });
+  //res.redirect("/login");
+};
