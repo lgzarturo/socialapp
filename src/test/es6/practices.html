@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prácticas con ES6</title>
+  <style>
+    #aqua {
+      background-color: aqua;
+      height: 100px;
+    }
+
+    #red {
+      background-color: red;
+      height: 100px;
+    }
+
+  </style>
+</head>
+<body>
+  <script>
+    /*
+      Diferencias entre let y var
+    */
+    function printNumbers() {
+      // Scope de la variable `i` limitado a la función
+      for (var i = 0; i < 10; i++) {
+        console.log(i);
+      }
+    }
+
+    printNumbers(); {
+      var i = 1;
+      let i_let = 2; // Variable con scope de bloque
+      i_let++;
+      console.log(`i_let tiene el valor => ${i_let}`);
+    }
+    console.log(`variable con var => ${i}`);
+    // console.log(`variable con let => ${i_let}`);
+
+    /*
+      Introducción de la palabra reservada `const`
+    */
+    const PI = 3.1416; // No se puede reasignar
+    console.log(`Valor de PI => ${PI}`);
+    // PI = 3.14; // Error de asignación
+    {
+      const GOOGLE = 'Google'; // Constante con scope de bloque
+      console.log(`Valor de GOOGLE => ${GOOGLE}`);
+    }
+    // console.log(`Valor de GOOGLE => ${GOOGLE}`); // Error de referencia
+    const obj = {
+      name: 'Juan',
+      age: 30
+    };
+    obj.name = 'Pedro'; // Se puede reasignar
+    obj.size = 'M'; // Se puede agregar una propiedad
+    console.log(`Valor de obj => `, obj);
+    // obj = { name: 'Pedro', age: 30 }; // Error de asignación
+
+    /*
+      Declarar funciones anonimas
+    */
+    hello(); // Hoisting, las funciones son elevadas al tope de la pila
+    function hello() {
+      console.log('Hello');
+    }
+
+    // miau(); // Error de referencia, no se puede llamar antes de declarar la función
+    const miau = function () {
+      console.log('Miau');
+    };
+    miau();
+
+    // Función anónima
+    function anonymous() {
+      return function () {
+        console.log('Hello from Anonymous');
+      };
+    }
+    anonymous()();
+    const hackers = anonymous();
+    hackers();
+
+    /*
+      Funciones de flecha
+      - Deben se declaradas antes de ser utilizadas
+      - Tienen que ser utilizadas como funciones de expresión
+      - Se tienen que retornar o suministrar como callbacks
+    */
+    const sum = (a, b) => a + b;
+    const percentage = (a, b) => {
+      let multi = a * b;
+      let divide = multi / 100;
+      return divide;
+    };
+    console.log(`Suma => ${sum(1, 2)}`);
+    console.log(`Porcentaje => ${percentage(10, 20)}`);
+
+    // Cuando una función flecha tiene un solo parámetro, se puede omitir los paréntesis
+    const alert = message => `Alert: ${message}`;
+    console.log(`Alert => ${alert('Hello alert from arrow function')}`);
+
+    // Retorna una función
+    const error = message => () => `Alert: ${message}`;
+    console.log(`Alert => ${error('Hello error from arrow function')()}`);
+
+    // Retorna un objeto
+    const warn = message => {
+      return {
+        message: `Alert on warning: ${message}`,
+        type: 'warning'
+      };
+    };
+    console.log(`Alert => `, warn('Hello warning from arrow function'));
+    const success = message => ({
+      message: `Alert on success: ${message}`,
+      type: 'success'
+    });
+    console.log(`Alert => `, success('Hello success from arrow function'));
+
+    // Práctica de uso de funciones de flecha
+    const superheroes = [{
+        name: 'Batman',
+        publisher: 'DC Comics',
+        strength: 8
+      },
+      {
+        name: 'Superman',
+        publisher: 'DC Comics',
+        strength: 100
+      },
+      {
+        name: 'Spiderman',
+        publisher: 'Marvel Comics',
+        strength: 75
+      },
+      {
+        name: 'Wolverine',
+        publisher: 'Marvel Comics',
+        strength: 35
+      }
+    ];
+
+    const calculateTotalStrength = (heroes, company) => {
+      return heroes
+        .filter(superhero => superhero.publisher === company)
+        .map(superhero => superhero.strength)
+        .reduce((total, strength) => total + strength, 0)
+    };
+
+    console.log(`DC Strength => ${calculateTotalStrength(superheroes, 'DC Comics')}`);
+    console.log(`Marvel Strength => ${calculateTotalStrength(superheroes, 'Marvel Comics')}`);
+
+    /*
+      Como funciona el objeto this en javascript
+    */
+    function login() {
+      console.log(`This: `, this); // this apunta a window
+    }
+    login();
+
+    const user = {
+      name: 'Juan',
+      age: 30,
+      sayHello: function () {
+        // this apunta al objeto user
+        console.log(`Hello, my name is ${this.name}`, this);
+      }
+    };
+
+    user.sayHello();
+    const greetings = user.sayHello;
+    greetings(); // Ahora this apunta al objeto global
+    const greetingsUser = greetings.bind(user); // Ahora this apunta al objeto user
+    greetingsUser();
+
+    function Car(model, year) {
+      this.model = model;
+      this.year = year;
+      // En una funcion anonima, this apunta al scope local del objeto `this`
+      this.getData = function () {
+        return `${this.model} - ${this.year}`;
+      };
+      // En las funciones arrow this hace referencia al objeto `this` que esta afuera de su declaración
+      /*
+      setInterval(() => {
+        console.log(`${this.model} - ${this.year}`);
+        this.year++;
+      }, 1000);
+      */
+      console.log(`Car ${this.model} this: `, this);
+    }
+    const car = new Car('Ford', 2020);
+
+    /*
+      Uso de template literals en javascript
+    */
+    function sayHello(greetings) {
+      return `
+        El evento ${greetings.event}
+        se realizará en ${greetings.location}
+        ${greetings.hour > 12 ? 'por la tarde' :  'antes del medio día'}
+        a las ${greetings.hour}:00 horas.`;
+    }
+    const greetings_obj = {
+      event: 'Birthday Party',
+      location: 'Barcelona',
+      hour: 18
+    };
+    console.log(`Say Hello => ${sayHello(greetings_obj)}`);
+
+    /*
+      Uso de plantillas de HTML en javascript
+    */
+    const orders = [{
+        id: 1,
+        total: 200,
+        date: '2020-01-01',
+        status: 'pending'
+      },
+      {
+        id: 2,
+        total: 300,
+        date: '2020-01-02',
+        status: 'pending'
+      },
+      {
+        id: 3,
+        total: 400,
+        date: '2020-01-03',
+        status: 'pending'
+      }
+    ];
+
+    function renderOrders(orders) {
+      return `
+        <div id="root">
+          <div id="orders">
+            <h1>Orders</h1>
+            <h4>Cantidad de artículos: ${orders.length}</h4>
+            <h4>Total: ${orders.reduce((total, order) => total + order.total, 0)}</h4>
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Total</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${orders.map(order => `
+                  <tr>
+                    <td>${order.id}</td>
+                    <td>${order.total}</td>
+                    <td>${order.date}</td>
+                    <td>${order.status}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    document.body.innerHTML = renderOrders(orders);
+
+    /*
+      Uso de argumentos por defecto en javascript
+    */
+    function addContainer(target, colorId = "aqua") {
+      const container = document.createElement('div');
+      container.id = colorId;
+      if (target == null) {
+        target = document.body;
+      }
+      target.appendChild(container);
+    }
+
+    addContainer();
+    addContainer(document.querySelector('#root'), 'red');
+
+    function requireArgument(argument) {
+      throw new Error(`Argument ${argument} is required`);
+    }
+
+    function personName(
+      target = document.body,
+      name = requireArgument('name'),
+      lastName = requireArgument('lastName'),
+      fullName = `${name} ${lastName}`.trim()
+    ) {
+      const h1 = document.createElement('h1');
+      h1.innerText = fullName;
+      target.appendChild(h1);
+    }
+
+    // personName(undefined); // Lanza un error porque se requiere el argumento name
+    // personName(undefined, 'John'); // Lanza un error porque se requiere el argumento lastName
+    personName(undefined, 'John', 'Doe');
+    personName(document.querySelector('#root'), 'Jane', 'Doe');
+
+    /*
+      Uso del operador spread en javascript
+    */
+    const numbers = [11, 218, 321, 469, 512, 63, 71, 83, 92, 99];
+    console.log(Math.max.apply(Math, numbers));
+    console.log(Math.max(...numbers));
+
+    /*
+      Uso del operador rest en javascript
+    */
+    function sellTickets() {
+      console.log(arguments);
+      const price = arguments[0];
+      const clients = Array.prototype.slice.call(arguments, 1);
+      clients.forEach(client => {
+        console.log(`${client} paga ${price}`);
+      });
+    }
+    sellTickets(100, 'Arturo', 'Juan', 'Roberto', 'Armando', 'Pedro');
+
+    function sellTicketsWithSpread(price, ...clients) {
+      clients.forEach(client => {
+        console.log(`${client} paga ${price}`);
+      });
+    }
+    sellTicketsWithSpread(200, 'Arturo', 'Juan', 'Roberto', 'Armando', 'Pedro');
+
+    /*
+      Desestructuración de arreglos en javascript
+    */
+    const persons = [{
+        name: 'Juan',
+        age: 30
+      },
+      {
+        name: 'Pedro',
+        age: 25
+      },
+      {
+        name: 'Roberto',
+        age: 35
+      }
+    ];
+
+    const [juan, pedro, roberto] = persons;
+    console.log(juan, pedro, roberto);
+
+    function getFullNamePerson() {
+      return ['Clark', 'Kent'];
+    }
+
+    const [firstName, lastName, ageOfBirth = 1981] = getFullNamePerson();
+    console.log(firstName, lastName, ageOfBirth);
+
+    /*
+      Desestructuración de objetos en javascript
+    */
+    const person = {
+      name: 'Clark',
+      lastName: 'Kent',
+      age: 29,
+      information: {
+        address: '123 Main Street',
+        city: 'Metropolis',
+        country: 'United States of America'
+      },
+      powers: ['flight', 'super-strength', 'x-ray vision'],
+      getFullName: () => `${person.name} ${person.lastName}`
+    };
+
+    let {
+      name,
+      age,
+      getFullName
+    } = person;
+    age++;
+    console.log(`La edad de ${name} es ${age} y su nombre completo es ${getFullName()}`);
+    const {
+      information: {
+        city
+      }
+    } = person;
+    console.log(`${getFullName()} vive en ${city}`);
+    const {
+      powers: [firstPower, secondPower]
+    } = person;
+    console.log(`${getFullName()} tiene dos poderes: ${firstPower} y ${secondPower}`);
+
+    function superPower({
+      getFullName,
+      powers: [firstPower]
+    }) {
+      console.log(`${getFullName()} tiene el poder: ${firstPower}`);
+    }
+    superPower(person);
+
+  </script>
+</body>
+</html>
