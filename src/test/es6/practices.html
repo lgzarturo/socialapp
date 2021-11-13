@@ -19,6 +19,19 @@
   </style>
 </head>
 <body>
+  <ul>
+    <li>0</li>
+    <li>1</li>
+    <li>2</li>
+    <li>3</li>
+    <li>4</li>
+    <li>5</li>
+    <li>6</li>
+    <li>7</li>
+    <li>8</li>
+    <li>9</li>
+  </ul>
+  <div id="webapp"></div>
   <script>
     /*
       Diferencias entre let y var
@@ -266,7 +279,8 @@
       `;
     }
 
-    document.body.innerHTML = renderOrders(orders);
+    document.getElementById('webapp').innerHTML = renderOrders(orders);
+    // document.body.innerHTML = renderOrders(orders);
 
     /*
       Uso de argumentos por defecto en javascript
@@ -398,6 +412,322 @@
       console.log(`${getFullName()} tiene el poder: ${firstPower}`);
     }
     superPower(person);
+
+    /*
+      Ciclo for of en javascript
+    */
+
+    let items = [1, 2, 3, 4, 5];
+
+    // Esta no es una forma muy optima para iterar arreglos
+    for (let item of items) {
+      console.log(item, items[item]);
+    }
+
+    // Iterar arreglos por medio del metodo forEach
+    items.forEach(function (item, index) {
+      // break; no termina el ciclo
+      console.log(item, index);
+    });
+
+    // Iterar cualquier elemento como array, strings, listas de nodos, maps o sets
+    for (const char of 'Hola arturo') {
+      console.log(char);
+    }
+
+    const animals = ['dog', 'cat', 'bird', 'fish'];
+    for (const animal of animals) {
+      if (animal === 'bird') break;
+      console.log(animal);
+    }
+
+    const tenColors = ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet', 'brown', 'gray', 'pink'];
+    /*
+    document.querySelectorAll('li').forEach((li, i) => {
+      if (index === 5) return; // No se ejecuta el ultimo elemento pero se siguen iterando
+      li.style.backgroundColor = tenColors[i];
+    });
+    */
+    let index = 0;
+    for (const element of document.querySelectorAll('li')) {
+      if (index === 5) break;
+      element.style.backgroundColor = tenColors[index];
+      index++;
+    }
+
+    /*
+      Usando maps en javascript, los maps son una estructura de datos que nos permite almacenar pares de valores
+    */
+    const team = {
+      10: {
+        name: 'Leonel Messi',
+        goals: 20
+      },
+      9: {
+        name: 'Cristiano Ronaldo',
+        goals: 10
+      },
+      7: {
+        name: 'Luis Suarez',
+        goals: 10
+      },
+      6: {
+        name: 'Neymar',
+        goals: 10
+      },
+      5: {
+        name: 'Eden Hazard',
+        goals: 10
+      },
+      4: {
+        name: 'Paul Pogba',
+        goals: 10
+      },
+      3: {
+        name: 'Gerard Pique',
+        goals: 10
+      },
+      2: {
+        name: 'Sergio Ramos',
+        goals: 10
+      },
+      1: {
+        name: 'Andres Iniesta',
+        goals: 10
+      }
+    }
+
+    console.log(Object.keys(team)); // Retorna un array con los indices de los elementos del map
+    team.__proto__.error = "Error" // Agrega una propiedad al map
+
+    for (const key in team) {
+      console.log(key);
+    }
+    console.log(team);
+    const map = new Map([
+      [6, {
+        name: 'Neymar',
+        goals: 10
+      }],
+      [5, {
+        name: 'Eden Hazard',
+        goals: 10
+      }],
+      [4, {
+        name: 'Paul Pogba',
+        goals: 10
+      }],
+      [3, {
+        name: 'Gerard Pique',
+        goals: 10
+      }],
+      [2, {
+        name: 'Sergio Ramos',
+        goals: 10
+      }],
+      [1, {
+        name: 'Andres Iniesta',
+        goals: 10
+      }]
+    ]);
+    map.set(10, {
+      name: 'Leonel Messi',
+      goals: 20
+    });
+    console.log(map);
+    // Iterar un map por medio de las llaves
+    for (let number of map.keys()) {
+      console.log(number); // Con map se mantiene el orden de los elementos
+    }
+    // Iterar un map por medio de los valores
+    for (let player of map.values()) {
+      console.log(player);
+    }
+    // Iterar un map por medio de los pares
+    for (let [number, player] of map.entries()) {
+      console.log(number, player);
+    }
+    map.forEach((player, number) => console.log(number, player));
+
+    /*
+      Usando sets en javascript, los sets son una estructura de datos que nos permite almacenar valores unicos
+    */
+
+    let sizes = new Set([99, 50, 40]);
+    sizes.add(10);
+    sizes
+      .add(20)
+      .add(30)
+      .add(10);
+    console.log(sizes);
+
+    for (let size of sizes) {
+      console.log(`Tamaño: ${size}`);
+    }
+
+    const arraySizes = [...sizes];
+    console.log(arraySizes);
+    const setSizes = new Set([...sizes].map((size, index) => `Tamaño número ${index}: ${size}`));
+    console.log(setSizes);
+
+    /*
+      Usando mejoras en los objetos literales en javascript
+    */
+    const pokemonName = 'Pikachu';
+    const pokemonType = 'Electric';
+    const hp = 100;
+    const attack = 50;
+    const defense = 40;
+    const abilities = ['Lightning', 'Thunderbolt'];
+    const speed = 90;
+    const pokemonTeam = 'Ash'
+
+    const pokemon = {
+      pokemonName,
+      pokemonType,
+      hp,
+      attack,
+      defense,
+      abilities,
+      speed,
+      [`${pokemonTeam}Team`]: true, // Creando una propiedad con un nombre dinamico
+      primaryAttack() {
+        console.log(`${this.pokemonName} ataca con ${this.abilities[0]}`);
+      },
+    };
+    pokemon[`${pokemonName} - ${pokemonTeam}`] = pokemonTeam;
+
+    console.log(pokemon);
+    pokemon.primaryAttack();
+
+    /*
+      Trabajando con Object.assign
+    */
+
+    const futbolPlayer = {
+      name: 'Leonel Messi',
+      age: 32,
+      country: 'Argentina',
+      goals: 20,
+      team: 'Barcelona'
+    };
+    const profession = {
+      profession: 'Footballer',
+      specialty: 'Soccer',
+      salary: 1000000
+    };
+    const preferences = {
+      hobbies: ['Soccer', 'Football', 'Basketball'],
+      country: 'Argentina',
+      favoriteTeam: 'Barcelona'
+    };
+
+    const leonel = {}
+
+    Object.keys(futbolPlayer).forEach(property => {
+      leonel[property] = futbolPlayer[property];
+    });
+    Object.keys(profession).forEach(property => {
+      leonel[property] = profession[property];
+    });
+
+    // En caso de existir una propiedad duplicada, se sobreescribe por el ultimo valor
+    const leoMessi = Object.assign({}, futbolPlayer, profession, preferences);
+
+    console.log(leonel, leoMessi, futbolPlayer);
+
+    /*
+      Trabajando con clases y prototipos
+    */
+
+    function VehicleProto(brand, model, year, color, numberOfWheels) {
+      this.brand = brand;
+      this.model = model;
+      this.year = year;
+      this.color = color;
+      this.numberOfWheels = numberOfWheels;
+      /*
+      this.getInfo = function () {
+        return `${this.brand} ${this.model} ${this.year} ${this.color} wheels: ${this.numberOfWheels}`;
+      }
+      */
+    };
+
+    VehicleProto.prototype.getInfo = function () {
+      return `${this.brand} ${this.model} ${this.year} ${this.color} wheels: ${this.numberOfWheels}`;
+    }
+
+    VehicleProto.prototype.maxVelocity = function () {
+      return this.numberOfWheels * 10;
+    }
+
+    const bike = new VehicleProto('Yamaha', 'YBR', '2020', 'Black', 2);
+    const airplane = new VehicleProto('Boeing', '747', '2020', 'White', 4);
+    console.log(bike, bike.getInfo(), typeof bike, bike instanceof VehicleProto);
+    console.log(airplane, bike);
+    console.log(airplane.getInfo(), airplane.maxVelocity());
+
+    function MotorcycleProto(brand, model, year, color, numberOfWheels) {
+      VehicleProto.call(this, brand, model, year, color, numberOfWheels);
+    };
+
+    MotorcycleProto.prototype = new VehicleProto();
+    MotorcycleProto.prototype.constructor = MotorcycleProto;
+    MotorcycleProto.prototype.jump = function () {
+      return `${this.brand} ${this.model} jumps`;
+    }
+
+    const moto = new MotorcycleProto('Honda', 'CB1000', '2020', 'Red', 2);
+    console.log(moto, moto.getInfo(), moto.maxVelocity(), moto.jump(), moto instanceof MotorcycleProto);
+
+    // clases
+
+    class Vehicle {
+      constructor(brand, model, year, color, numberOfWheels) {
+        this._brand = brand;
+        this._model = model;
+        this._year = year;
+        this._color = color;
+        this._numberOfWheels = numberOfWheels;
+      }
+
+      static requirements() {
+        console.log('All vehicles must have a brand, model, year, color and number of wheels');
+      }
+
+      getInfo() {
+        return `${this._brand} ${this._model} ${this._year} ${this._color} wheels: ${this._numberOfWheels}`;
+      }
+
+      maxVelocity() {
+        return this._numberOfWheels * 10;
+      }
+
+      get brand() {
+        return `This vehicle is ${this._brand}`;
+      }
+
+      set brand(value) {
+        this._brand = `${value} 2.0`;
+      }
+    }
+
+    Vehicle.prototype.fuelType = 'gasoline';
+
+    class Motorcycle extends Vehicle {
+      constructor(brand, model, year, color) {
+        super(brand, model, year, color, 2);
+      }
+
+      jump() {
+        return `${this.brand} and jump`;
+      }
+    };
+
+    const mazda = new Vehicle('Mazda', '3', '2020', 'Red', 4);
+    const italica = new Motorcycle('Yamaha', 'YBR', '2020', 'Red');
+    console.log(mazda, mazda.getInfo(), mazda.maxVelocity(), mazda.brand);
+    console.log(italica, italica.getInfo(), italica.maxVelocity(), italica.jump());
 
   </script>
 </body>
