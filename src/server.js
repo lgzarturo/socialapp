@@ -1,17 +1,18 @@
-const express = require("express");
-const session = require("express-session");
-const MongoStore = require("connect-mongo");
-const mongoose = require("mongoose");
-const passport = require("passport");
-const passportConfig = require("./app/config/passport");
-const userController = require("./app/controllers/users");
+const path = require('path');
+const express = require('express');
+const session = require('express-session');
+const MongoStore = require('connect-mongo');
+const mongoose = require('mongoose');
+const passport = require('passport');
+const passportConfig = require('./app/config/passport');
+const userController = require('./app/controllers/users');
 
-const MONGO_URL = "mongodb://127.0.0.1:27017/socialapp";
+const MONGO_URL = 'mongodb://127.0.0.1:27017/socialapp';
 const app = express();
 
 mongoose.Promise = global.Promise;
 mongoose.connect(MONGO_URL);
-mongoose.connection.on("error", (err) => {
+mongoose.connection.on('error', (err) => {
   throw err;
 });
 
@@ -19,7 +20,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
   session({
-    secret: "my secret",
+    secret: 'my secret',
     resave: false,
     saveUninitialized: true,
     store: MongoStore.create({
@@ -31,16 +32,32 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.get("/", (req, res) => {
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'pug');
+
+app.use('/css', express.static(path.join(__dirname, '..', 'node_modules', 'bootstrap', 'dist', 'css')));
+app.use('/js', express.static(path.join(__dirname, '..', 'node_modules', 'bootstrap', 'dist', 'js')));
+app.use('/js', express.static(path.join(__dirname, '..', 'node_modules', 'jquery', 'dist')));
+app.use('/public', express.static(path.join(__dirname, '..', 'public')));
+
+app.get('/', (req, res) => {
+  res.render('home');
+});
+
+/*
+app.get('/', (req, res) => {
   req.session.count = req.session.count ? req.session.count + 1 : 1;
   res.status(200).json({ message: `Hola has visto esta página ${req.session.count}` });
 });
-app.post("/signup", userController.signup);
-app.post("/login", userController.login);
-app.get("/logout", passportConfig.isAuthenticated, userController.logout);
-app.get("/profile", passportConfig.isAuthenticated, (req, res) => {
+*/
+
+app.post('/signup', userController.signup);
+app.post('/login', userController.login);
+app.get('/logout', passportConfig.isAuthenticated, userController.logout);
+app.get('/profile', passportConfig.isAuthenticated, (req, res) => {
   res.status(200).json(req.user);
 });
+
 app.listen(3000, () => {
-  console.log("Server running on port 3000");
+  console.log('Server running on port 3000');
 });
