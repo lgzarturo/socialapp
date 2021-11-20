@@ -1,11 +1,17 @@
-const passport = require("passport");
-const User = require("../../model/user/User");
+const passport = require('passport');
+const User = require('../../model/user/User');
+
+exports.getSignup = (req, res, next) => {
+  res.render('users/signup');
+};
 
 exports.signup = (req, res, next) => {
+  const { email, password, name, biography } = req.body;
   const user = new User({
-    email: req.body.email,
-    password: req.body.password,
-    name: req.body.name,
+    email,
+    password,
+    name,
+    biography,
   });
   User.findOne({ email: req.body.email }, (err, userExists) => {
     if (err) {
@@ -13,7 +19,7 @@ exports.signup = (req, res, next) => {
     }
     if (userExists) {
       return res.status(400).json({
-        title: "User already exists",
+        title: 'User already exists',
         error: err,
       });
     }
@@ -27,7 +33,7 @@ exports.signup = (req, res, next) => {
           next(err);
         }
         res.status(201).json({
-          message: "User created",
+          message: 'User created',
           obj: result,
         });
       });
@@ -35,14 +41,18 @@ exports.signup = (req, res, next) => {
   });
 };
 
+exports.getLogin = (req, res, next) => {
+  res.render('users/login');
+};
+
 exports.login = (req, res, next) => {
-  passport.authenticate("local", (err, user, info) => {
+  passport.authenticate('local', (err, user, info) => {
     if (err) {
       next(err);
     }
     if (!user) {
       return res.status(401).json({
-        title: "Login failed",
+        title: 'Login failed',
         error: info,
       });
     }
@@ -51,7 +61,7 @@ exports.login = (req, res, next) => {
         next(err);
       }
       res.status(200).json({
-        message: "Login successful",
+        message: 'Login successful',
         obj: user,
       });
     });
@@ -61,6 +71,6 @@ exports.login = (req, res, next) => {
 exports.logout = (req, res, next) => {
   req.logout();
   res.status(200).json({
-    message: "Logout successful",
+    message: 'Logout successful',
   });
 };

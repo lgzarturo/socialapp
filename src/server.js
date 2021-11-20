@@ -40,18 +40,18 @@ app.use('/js', express.static(path.join(__dirname, '..', 'node_modules', 'bootst
 app.use('/js', express.static(path.join(__dirname, '..', 'node_modules', 'jquery', 'dist')));
 app.use('/public', express.static(path.join(__dirname, '..', 'public')));
 
+app.use((req, res, next) => {
+  res.locals.user = req.user;
+  next();
+});
+
 app.get('/', (req, res) => {
   res.render('home');
 });
 
-/*
-app.get('/', (req, res) => {
-  req.session.count = req.session.count ? req.session.count + 1 : 1;
-  res.status(200).json({ message: `Hola has visto esta página ${req.session.count}` });
-});
-*/
-
+app.get('/signup', userController.getSignup);
 app.post('/signup', userController.signup);
+app.get('/login', userController.getLogin);
 app.post('/login', userController.login);
 app.get('/logout', passportConfig.isAuthenticated, userController.logout);
 app.get('/profile', passportConfig.isAuthenticated, (req, res) => {

@@ -6,12 +6,20 @@ header
         span.navbar-toggler-icon
       #navbarCollapse.collapse.navbar-collapse
         ul.navbar-nav.me-auto.mb-2.mb-md-0
-          li.nav-item
-            a.nav-link.active(aria-current='page' href='#') Home
-          li.nav-item
-            a.nav-link(href='#') Link
-          li.nav-item
-            a.nav-link.disabled Disabled
+            li.nav-item
+                a.nav-link(href='/') Home
+            li.nav-item
+                a.nav-link(href='#') Explorar
+
         form.d-flex
-          input.form-control.me-2(type='search' placeholder='Search' aria-label='Search')
-          button.btn.btn-outline-success(type='submit') Search
+            ul.navbar-nav.me-auto.mb-2.mb-md-0
+                if user
+                    li.nav-item
+                        a.nav-link(href='/my-profile') #{user.name}
+                    li.nav-item
+                        a.nav-link(href='/logout') Logout
+                else
+                    li.nav-item
+                        a.nav-link(href='/signup') Signup
+                    li.nav-item
+                        a.nav-link(href='/login') Login
