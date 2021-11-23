@@ -1,0 +1,21 @@
+extends layout
+
+block content
+  .row
+    .col-sm-8.col-sm-offset-2
+      br
+      form(role='form' method='post')
+        input.form-control(name='query' type='search' value=`${query}` placeholder='Search for a user...')
+
+      table.table.explore
+        tbody
+          each user in users
+            tr
+              td
+                .media
+                  a.pull-left(href=`/profile/${user._id}`)
+                    img.media-object.img-rounded(src=`${user.avatar(50)}`, alt='${user.name}' style='width: 50px; height: 50px;')
+                  .media-body
+                    a(href=`/profile/${user._id}`)
+                      h4.media-heading(data-bs-toggle='tooltip' title='${user.name}') #{user.name}
+                    p.summary #{user.biography}
