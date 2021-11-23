@@ -1,10 +1,11 @@
-const Message = require('../../model/message/Message');
+const Message = require("../../model/message/Message");
 
 exports.sendMessage = (req, res, next) => {
   console.log(req.body);
   const { text } = req.body;
   if (!text) {
-    return res.redirect('/');
+    req.flash("errors", { message: "Message can't be empty" });
+    return res.redirect("/");
   }
   const message = new Message({
     text,
@@ -13,7 +14,7 @@ exports.sendMessage = (req, res, next) => {
   message
     .save()
     .then(() => {
-      res.redirect('/');
+      res.redirect("/");
     })
     .catch((err) => {
       next(err);
@@ -23,5 +24,5 @@ exports.sendMessage = (req, res, next) => {
 exports.getMessageByUser = (userIds) => {
   return Message.find({ user: { $in: userIds } })
     .sort({ createdAt: -1 })
-    .populate('user');
+    .populate("user");
 };

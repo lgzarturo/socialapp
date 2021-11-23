@@ -1,12 +1,17 @@
-const passport = require('passport');
-const User = require('../../model/user/User');
+const passport = require("passport");
+const User = require("../../model/user/User");
 
 exports.getSignup = (req, res, next) => {
-  res.render('users/signup');
+  res.render("users/signup");
 };
 
 exports.signup = (req, res, next) => {
   const { email, password, name, biography } = req.body;
+  if (!email || !password || !name || !biography) {
+    req.flash("errors", { message: "All fields are required" });
+    return res.redirect("/signup");
+  }
+
   const user = new User({
     email,
     password,
@@ -18,10 +23,8 @@ exports.signup = (req, res, next) => {
       next(err);
     }
     if (userExists) {
-      return res.status(400).json({
-        title: 'User already exists',
-        error: err,
-      });
+      req.flash("errors", { message: "User already exists" });
+      return res.redirect("/signup");
     }
 
     user.save((err, result) => {
@@ -32,45 +35,35 @@ exports.signup = (req, res, next) => {
         if (err) {
           next(err);
         }
-        res.status(201).json({
-          message: 'User created',
-          obj: result,
-        });
+        res.redirect("/");
       });
     });
   });
 };
 
 exports.getLogin = (req, res, next) => {
-  res.render('users/login');
+  res.render("users/login");
 };
 
 exports.login = (req, res, next) => {
-  passport.authenticate('local', (err, user, info) => {
+  passport.authenticate("local", (err, user, info) => {
     if (err) {
       next(err);
     }
     if (!user) {
-      return res.status(401).json({
-        title: 'Login failed',
-        error: info,
-      });
+      req.flash("errors", { message: "Login failed" });
+      return res.redirect("/login");
     }
     req.logIn(user, (err) => {
       if (err) {
         next(err);
       }
-      res.status(200).json({
-        message: 'Login successful',
-        obj: user,
-      });
+      res.redirect("/");
     });
   })(req, res, next);
 };
 
 exports.logout = (req, res, next) => {
   req.logout();
-  res.status(200).json({
-    message: 'Logout successful',
-  });
+  return res.redirect("/");
 };

@@ -1,6 +1,7 @@
 const path = require("path");
 const express = require("express");
 const session = require("express-session");
+const flash = require("express-flash");
 const MongoStore = require("connect-mongo");
 const mongoose = require("mongoose");
 const passport = require("passport");
@@ -35,6 +36,7 @@ app.use(
 );
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(flash());
 
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "pug");
