@@ -1,4 +1,4 @@
-const messageController = require("./messages");
+const messageController = require("../messages/messages.controller");
 
 exports.getHome = (req, res) => {
   if (req.user) {

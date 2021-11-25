@@ -1,4 +1,4 @@
-const User = require("../../model/user/User");
+const User = require("../users/users.model");
 
 exports.getExplore = (req, res) => {
   res.render("explore", {

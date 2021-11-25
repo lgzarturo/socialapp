@@ -1,4 +1,4 @@
-const Message = require("../../model/message/Message");
+const Message = require("./messages.model");
 
 exports.sendMessage = (req, res, next) => {
   console.log(req.body);

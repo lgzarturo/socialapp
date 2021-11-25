@@ -1,5 +1,5 @@
-const User = require("../../model/user/User");
-const messageController = require("../controllers/messages");
+const User = require("../users/users.model");
+const messageController = require("../messages/messages.controller");
 
 exports.getMeProfile = (req, res) => {
   getProfile(req.user._id)
