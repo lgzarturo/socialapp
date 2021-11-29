@@ -1,6 +1,8 @@
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 const User = require("../app/users/users.model");
+const error = require("../libs/errors").codeErrors;
+const code = require("http-status-codes").StatusCodes;
 
 passport.serializeUser((user, done) => {
   done(null, user._id);
@@ -23,10 +25,16 @@ passport.use(
           return done(err);
         }
         if (!user) {
-          return done(null, false, { message: "Incorrect email" });
+          return done(null, false, {
+            error: error.USER.DATA_VALIDATION_ERROR,
+            message: "Incorrect email",
+          });
         }
         if (!user.isValidPassword(password)) {
-          return done(null, false, { message: "Incorrect password" });
+          return done(null, false, {
+            error: error.USER.DATA_VALIDATION_ERROR,
+            message: "Incorrect password",
+          });
         }
         return done(null, user);
       });
@@ -38,5 +46,8 @@ exports.isAuthenticated = (req, res, next) => {
   if (req.isAuthenticated()) {
     return next();
   }
-  res.status(401).json({ message: "Unauthorized" });
+  res.status(code.UNAUTHORIZED).json({
+    error: error.AUTH.UNAUTHORIZED,
+    message: "Unauthorized",
+  });
 };

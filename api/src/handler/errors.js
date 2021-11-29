@@ -1,5 +1,10 @@
 const mongoose = require("mongoose");
 const log = require("../config/logger");
+const error = require("../libs/errors").codeErrors;
+const code = require("http-status-codes").StatusCodes;
+
+const MONGO_CONNECTION_ERROR_CODE = 11000;
+const MONGO_ERROR_NAME = "MongoError";
 
 exports.process = (fn) => {
   return (req, res, next) => {
@@ -10,17 +15,18 @@ exports.process = (fn) => {
 exports.databaseErrorHandler = (err, req, res, next) => {
   if (
     err instanceof mongoose.Error ||
-    (err.name === "MongoError" && err.code === 11000) ||
+    (err.name === MONGO_ERROR_NAME &&
+      err.code === MONGO_CONNECTION_ERROR_CODE) ||
     err instanceof mongoose.Error.ValidationError
   ) {
-    err.status = 500;
+    err.status = code.INTERNAL_SERVER_ERROR;
     err.message = `Error inesperado relacionado con la base de datos.`;
   }
   next(err);
 };
 
 exports.bodySizeErrorHandler = (err, req, res, next) => {
-  if (req.status === 413) {
+  if (req.status === code.REQUEST_TOO_LONG) {
     err.message = `El tamaño del contenido en la solicitud [${req.path}] excede el tamaño permitido. El máximo permitido es ${err.limit} bytes`;
     log.error(err);
   }
@@ -29,13 +35,19 @@ exports.bodySizeErrorHandler = (err, req, res, next) => {
 
 exports.productionErrorHandler = (err, req, res, next) => {
   log.error(err.stack);
-  res.status(err.status || 500);
-  res.json({ error: "Something went wrong", message: err.message });
+  const statusCode = err.status || code.INTERNAL_SERVER_ERROR;
+  res.status(statusCode);
+  res.json({
+    error: error.GENERAL.PRODUCTION_ERROR,
+    message: err.message,
+  });
 };
 
 exports.developmentErrorHandler = (err, req, res, next) => {
-  res.status(err.status || 500);
+  const statusCode = err.status || code.INTERNAL_SERVER_ERROR;
+  res.status(statusCode);
   res.json({
+    error: `${error.GENERAL.ERROR}${statusCode}`,
     message: err.message,
     stack: err.stack || "",
   });

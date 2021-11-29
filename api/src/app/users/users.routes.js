@@ -4,6 +4,7 @@ const uuidv4 = require("uuid/v4");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const passport = require("passport");
+const code = require("http-status-codes").StatusCodes;
 
 const config = require("../../config");
 const log = require("../../config/logger");
@@ -84,7 +85,7 @@ userRouter.get(
 
     if (!user) {
       let err = new Error("User not found");
-      err.status = 404;
+      err.status = code.NOT_FOUND;
       throw err;
     }
     res.json(hideFields(user));
@@ -101,13 +102,13 @@ userRouter.post(
       log.warn(`User with email ${user.email} already exists`);
       throw new UserExistsError();
     }
-    const passwordHashed = await bcrypt.hash(user.password, 10);
+    const passwordHashed = await bcrypt.hash(user.password, config.saltRounds);
     const userCreated = await userController.create(user, passwordHashed);
     if (!userCreated) {
       log.error(`Error creating user ${user.email}`);
       throw new Error("User not created");
     }
-    res.status(201).json({
+    res.status(code.CREATED).json({
       token: createToken(userCreated._id),
       user: hideFields(userCreated),
     });
@@ -130,9 +131,11 @@ userRouter.post(
       log.warn(`User with email ${user.email} not found`);
       throw new IncorrectCredentialsError();
     }
-    let token = createToken(userFound.id);
     log.info(`User with email ${user.email} logged in`);
-    res.status(200).json({ token, user: hideFields(userFound) });
+    res.status(code.OK).json({
+      token: createToken(userFound.id),
+      user: hideFields(userFound),
+    });
   })
 );
 
@@ -140,7 +143,7 @@ userRouter.post(
   "/upload",
   [jwtAuthenticate],
   handleErrors(async (req, res) => {
-    res.status(200).json({
+    res.status(code.OK).json({
       message: "Uploaded",
     });
   })

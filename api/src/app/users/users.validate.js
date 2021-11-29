@@ -1,5 +1,7 @@
 const Joi = require("joi");
 const log = require("../../config/logger");
+const error = require("../../libs/errors").codeErrors;
+const code = require("http-status-codes").StatusCodes;
 
 const userBlueprint = Joi.object().keys({
   email: Joi.string().email().required(),
@@ -20,7 +22,8 @@ exports.userValidate = (req, res, next) => {
   } else {
     log.info("Falló la validación del usuario");
     log.error(result.error.details.map((d) => d.message));
-    res.status(400).json({
+    res.status(code.BAD_REQUEST).json({
+      error: error.USER.DATA_VALIDATION_ERROR,
       message:
         "Información del usuario no cumple con los requisitos del sistema.",
     });
@@ -40,7 +43,8 @@ exports.loginValidate = (req, res, next) => {
 
   if (result.error == null) next();
 
-  res.status(400).json({
+  res.status(code.BAD_REQUEST).json({
+    error: error.USER.DATA_VALIDATION_ERROR,
     message: "Información de login no cumple con los requisitos del sistema.",
   });
 };

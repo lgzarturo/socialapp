@@ -18,7 +18,7 @@ const collections = seeder.readCollectionsFromPath(
 (async function () {
   try {
     await seeder.import(collections);
-    console.log("Seeding successfull");
+    console.log("Seeding successfully to database");
   } catch (err) {
     console.log("Seeding failed");
     console.error(err);

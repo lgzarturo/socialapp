@@ -19,16 +19,17 @@ const exploreController = require("./app/resources/explore.controller");
 
 const userRouter = require("./app/users/users.routes");
 
+const PUBLIC_DIR = path.join(__dirname, "..", "public");
+const IMAGES_DIR = path.join(PUBLIC_DIR, "images");
+
 let server;
 
 // Connect to MongoDB
 mongoose.Promise = global.Promise;
-
 mongoose.connect(config.database, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
-
 mongoose.connection.on("error", (err) => {
   log.error("Error en la conexión con la base de datos.");
   throw err;
@@ -36,14 +37,13 @@ mongoose.connection.on("error", (err) => {
 
 // Create Express server
 const app = express();
-
 app.use(express.json());
-app.use(express.raw({ type: "image/*", limit: "20mb" }));
+app.use(express.raw({ type: config.typeImage, limit: config.maxImageSize }));
 app.use(express.urlencoded({ extended: true }));
 
 // Logging configuration
 app.use(
-  morgan("short", {
+  morgan(config.logFormat, {
     stream: {
       write: (message) => log.info(message.trim()),
     },
@@ -55,23 +55,21 @@ passport.use(authJWT);
 app.use(passport.initialize());
 
 // Headers
-
 app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
-  res.setHeader("Access-Control-Allow-Headers", "*");
+  res.setHeader("Access-Control-Allow-Origin", config.cors.origin);
+  res.setHeader("Access-Control-Allow-Methods", config.cors.methods);
+  res.setHeader("Access-Control-Allow-Headers", config.cors.headers);
   next();
 });
 
 // Public files
-app.use(express.static(path.join(__dirname, "..", "public")));
-app.use(
-  "/images",
-  express.static(path.join(__dirname, "..", "public", "images"))
-);
+app.use(express.static(PUBLIC_DIR));
+app.use("/images", express.static(IMAGES_DIR));
 
+// Application routes
 app.use("/api/v1/users", userRouter);
 
+// API routes (deprecated)
 app.post("/api/v1/explore", exploreController.postExplore);
 app.post(
   "/api/v1/follow/:id",
@@ -91,6 +89,7 @@ app.post(
   messageController.sendMessage
 );
 
+// Error handlers
 app.use(errorHandler.databaseErrorHandler);
 app.use(errorHandler.bodySizeErrorHandler);
 
