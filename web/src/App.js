@@ -1,9 +1,12 @@
 import React from 'react';
+import Nav from './components/Nav';
+import Signup from './views/Signup';
 
 export default function App() {
   return (
-    <div>
-      <h1>Hello, world!</h1>
+    <div className="WrapperContainer">
+      <Nav />
+      <Signup />
     </div>
   );
 }

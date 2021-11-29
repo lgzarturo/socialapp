@@ -4,8 +4,7 @@ exports.sendMessage = (req, res, next) => {
   console.log(req.body);
   const { text } = req.body;
   if (!text) {
-    req.flash("errors", { message: "Message can't be empty" });
-    return res.redirect("/");
+    return res.status(400).json({ message: "Message can't be empty" });
   }
   const message = new Message({
     text,
@@ -14,7 +13,7 @@ exports.sendMessage = (req, res, next) => {
   message
     .save()
     .then(() => {
-      res.redirect("/");
+      res.status(200).json({ message: "Message sent" });
     })
     .catch((err) => {
       next(err);

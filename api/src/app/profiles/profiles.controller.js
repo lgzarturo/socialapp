@@ -24,12 +24,12 @@ exports.getProfile = (req, res) => {
   const hideFollowButton = req.user ? req.user._id.toString() === userId : true;
 
   if (req.user && req.user._id.equals(userId)) {
-    return res.redirect("/me/profile");
+    return res.status(400).json({ message: "You can't follow yourself" });
   }
 
   getProfile(userId)
     .then(([user, messages]) => {
-      res.render("users/profile", {
+      res.status(200).json({
         user,
         messages,
         itsFollowing,
@@ -49,7 +49,7 @@ exports.follow = (req, res) => {
     addFollowing(userId, followUserId),
     addFollower(userId, followUserId),
   ]).then(() => {
-    res.redirect(`/profile/${followUserId}`);
+    res.status(200).json({ message: "Followed" });
   });
 };
 
@@ -61,7 +61,7 @@ exports.unfollow = (req, res) => {
     removeFollowing(userId, followUserId),
     removeFollower(userId, followUserId),
   ]).then(() => {
-    res.redirect(`/profile/${followUserId}`);
+    res.status(200).json({ message: "Unfollowed" });
   });
 };
 

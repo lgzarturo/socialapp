@@ -1,100 +1,110 @@
+require("dotenv").config();
 const path = require("path");
+
+const morgan = require("morgan");
 const express = require("express");
-const session = require("express-session");
-const flash = require("express-flash");
-const MongoStore = require("connect-mongo");
 const mongoose = require("mongoose");
 const passport = require("passport");
+
 const passportConfig = require("./config/passport");
+const log = require("./config/logger");
+const config = require("./config");
+const authJWT = require("./libs/auth");
+const errorHandler = require("./handler/errors");
+
 const userController = require("./app/users/users.controller");
 const messageController = require("./app/messages/messages.controller");
 const profileController = require("./app/profiles/profiles.controller");
-const homeController = require("./app/resources/home.controller");
 const exploreController = require("./app/resources/explore.controller");
 
-const MONGO_URL = "mongodb://127.0.0.1:27017/socialapp";
-const app = express();
+const userRouter = require("./app/users/users.routes");
 
+let server;
+
+// Connect to MongoDB
 mongoose.Promise = global.Promise;
-mongoose.connect(MONGO_URL);
+
+mongoose.connect(config.database, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+
 mongoose.connection.on("error", (err) => {
+  log.error("Error en la conexión con la base de datos.");
   throw err;
 });
 
+// Create Express server
+const app = express();
+
 app.use(express.json());
+app.use(express.raw({ type: "image/*", limit: "20mb" }));
 app.use(express.urlencoded({ extended: true }));
+
+// Logging configuration
 app.use(
-  session({
-    secret: "my secret",
-    resave: false,
-    saveUninitialized: true,
-    store: MongoStore.create({
-      mongoUrl: MONGO_URL,
-      ttl: 7 * 24 * 60 * 60, // 1 day
-    }),
+  morgan("short", {
+    stream: {
+      write: (message) => log.info(message.trim()),
+    },
   })
 );
+
+// Passport configuration
+passport.use(authJWT);
 app.use(passport.initialize());
-app.use(passport.session());
-app.use(flash());
 
-app.set("views", path.join(__dirname, "views"));
-app.set("view engine", "pug");
-
-app.use(
-  "/css",
-  express.static(
-    path.join(__dirname, "..", "node_modules", "bootstrap", "dist", "css")
-  )
-);
-app.use(
-  "/js",
-  express.static(
-    path.join(__dirname, "..", "node_modules", "bootstrap", "dist", "js")
-  )
-);
-app.use(
-  "/js",
-  express.static(path.join(__dirname, "..", "node_modules", "jquery", "dist"))
-);
-app.use("/public", express.static(path.join(__dirname, "..", "public")));
+// Headers
 
 app.use((req, res, next) => {
-  res.locals.user = req.user;
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+  res.setHeader("Access-Control-Allow-Headers", "*");
   next();
 });
 
-app.get("/", homeController.getHome);
-app.get("/explore", exploreController.getExplore);
-app.post("/explore", exploreController.postExplore);
-app.get("/me/profile", profileController.getMeProfile);
-app.get("/profile/:id", profileController.getProfile);
-app.get(
-  "/follow/:id",
+// Public files
+app.use(express.static(path.join(__dirname, "..", "public")));
+app.use(
+  "/images",
+  express.static(path.join(__dirname, "..", "public", "images"))
+);
+
+app.use("/api/v1/users", userRouter);
+
+app.post("/api/v1/explore", exploreController.postExplore);
+app.post(
+  "/api/v1/follow/:id",
   passportConfig.isAuthenticated,
   profileController.follow
 );
-app.get(
-  "/unfollow/:id",
+app.post(
+  "/api/v1/unfollow/:id",
   passportConfig.isAuthenticated,
   profileController.unfollow
 );
-
-app.get("/signup", userController.getSignup);
-app.post("/signup", userController.signup);
-app.get("/login", userController.getLogin);
-app.post("/login", userController.login);
-app.get("/logout", passportConfig.isAuthenticated, userController.logout);
-app.get("/profile", passportConfig.isAuthenticated, (req, res) => {
-  res.status(200).json(req.user);
-});
-
+app.post("/api/v1/signup", userController.signup);
+app.post("/api/v1/login", userController.login);
 app.post(
-  "/message",
+  "/api/v1/message",
   passportConfig.isAuthenticated,
   messageController.sendMessage
 );
 
-app.listen(3000, () => {
-  console.log("Server running on port 3000");
-});
+app.use(errorHandler.databaseErrorHandler);
+app.use(errorHandler.bodySizeErrorHandler);
+
+if (config.environment === "development") {
+  app.use(errorHandler.developmentErrorHandler);
+  server = app.listen(config.port, () => {
+    log.info(`Aplicación escuchando en el puerto: ${config.port}`);
+  });
+} else {
+  app.use(errorHandler.productionErrorHandler);
+  app.listen();
+}
+
+module.exports = {
+  app,
+  server,
+};

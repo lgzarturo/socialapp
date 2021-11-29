@@ -1,0 +1,66 @@
+[
+  {
+    "_id": { "$oid": "5d4c0c54c4c868c50a564e60" },
+    "user": { "$oid": "5d4c0c54c4c868c50a564e5f" },
+    "friend": { "$oid": "5d4c0c54c4c868c50a564e5f" },
+    "createdAt": { "$date": "2019-08-08T11:49:40.882Z" },
+    "updatedAt": { "$date": "2019-08-08T11:49:40.882Z" },
+    "__v": 0
+  },
+  {
+    "_id": { "$oid": "5d4c0cd5c4c868c50a564e67" },
+    "user": { "$oid": "5d4c0cd5c4c868c50a564e66" },
+    "friend": { "$oid": "5d4c0cd5c4c868c50a564e66" },
+    "createdAt": { "$date": "2019-08-08T11:51:49.511Z" },
+    "updatedAt": { "$date": "2019-08-08T11:51:49.511Z" },
+    "__v": 0
+  },
+  {
+    "_id": { "$oid": "5d4c0d22c4c868c50a564e69" },
+    "user": { "$oid": "5d4c0cd5c4c868c50a564e66" },
+    "friend": { "$oid": "5d4c0c54c4c868c50a564e5f" },
+    "createdAt": { "$date": "2019-08-08T11:53:06.086Z" },
+    "updatedAt": { "$date": "2019-08-08T11:53:06.086Z" },
+    "__v": 0
+  },
+  {
+    "_id": { "$oid": "5d4c0d26c4c868c50a564e6a" },
+    "user": { "$oid": "5d4c0c54c4c868c50a564e5f" },
+    "friend": { "$oid": "5d4c0cd5c4c868c50a564e66" },
+    "createdAt": { "$date": "2019-08-08T11:53:10.888Z" },
+    "updatedAt": { "$date": "2019-08-08T11:53:10.888Z" },
+    "__v": 0
+  },
+  {
+    "_id": { "$oid": "5d4c0d85c4c868c50a564e6f" },
+    "user": { "$oid": "5d4c0d85c4c868c50a564e6e" },
+    "friend": { "$oid": "5d4c0d85c4c868c50a564e6e" },
+    "createdAt": { "$date": "2019-08-08T11:54:45.490Z" },
+    "updatedAt": { "$date": "2019-08-08T11:54:45.490Z" },
+    "__v": 0
+  },
+  {
+    "_id": { "$oid": "5d4c0dabc4c868c50a564e72" },
+    "user": { "$oid": "5d4c0d85c4c868c50a564e6e" },
+    "friend": { "$oid": "5d4c0cd5c4c868c50a564e66" },
+    "createdAt": { "$date": "2019-08-08T11:55:23.505Z" },
+    "updatedAt": { "$date": "2019-08-08T11:55:23.505Z" },
+    "__v": 0
+  },
+  {
+    "_id": { "$oid": "5d4c0dbdc4c868c50a564e73" },
+    "user": { "$oid": "5d4c0d85c4c868c50a564e6e" },
+    "friend": { "$oid": "5d4c0c54c4c868c50a564e5f" },
+    "createdAt": { "$date": "2019-08-08T11:55:41.038Z" },
+    "updatedAt": { "$date": "2019-08-08T11:55:41.038Z" },
+    "__v": 0
+  },
+  {
+    "_id": { "$oid": "5d4c0dfcc4c868c50a564e77" },
+    "user": { "$oid": "5d4c0dfcc4c868c50a564e76" },
+    "friend": { "$oid": "5d4c0dfcc4c868c50a564e76" },
+    "createdAt": { "$date": "2019-08-08T11:56:44.243Z" },
+    "updatedAt": { "$date": "2019-08-08T11:56:44.243Z" },
+    "__v": 0
+  }
+]

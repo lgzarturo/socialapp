@@ -1,21 +1,11 @@
 const User = require("../users/users.model");
 
-exports.getExplore = (req, res) => {
-  res.render("explore", {
-    users: [],
-    query: "",
-  });
-};
-
 exports.postExplore = (req, res) => {
   const { query } = req.body;
 
   User.find({ name: new RegExp(`.*${query}.*`, "i") })
     .select("_id name biography email")
     .then((users) => {
-      res.render("explore", {
-        users,
-        query,
-      });
+      res.status(200).json({ users, query });
     });
 };

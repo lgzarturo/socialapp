@@ -26,6 +26,11 @@ const UserSchema = new Schema(
       type: String,
       trim: true,
     },
+    portrait: {
+      type: String,
+      trim: true,
+      default: null,
+    },
     followers: [
       {
         type: Schema.Types.ObjectId,
@@ -41,6 +46,9 @@ const UserSchema = new Schema(
   },
   {
     timestamps: true,
+    toJSON: {
+      virtuals: true,
+    },
   }
 );
 
@@ -71,5 +79,30 @@ UserSchema.methods.avatar = function (size = 55) {
   const avatar = `https://avatars.dicebear.com/api/male/${size}-${md5}.svg`;
   return avatar;
 };
+
+UserSchema.virtual("sizeFollowers", {
+  ref: "friendship",
+  localField: "_id",
+  foreignField: "follower",
+  count: true,
+});
+
+UserSchema.virtual("sizeFollowings", {
+  ref: "friendship",
+  localField: "_id",
+  foreignField: "user",
+  count: true,
+});
+
+UserSchema.virtual("isFollowing")
+  .get(function () {
+    if (this._following == null) {
+      return false;
+    }
+    return this._following;
+  })
+  .set(function (value) {
+    this._following = value;
+  });
 
 module.exports = mongoose.model("User", UserSchema);
