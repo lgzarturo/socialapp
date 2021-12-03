@@ -7,7 +7,7 @@ const baseConfig = {
     headers: process.env.CORS_ORIGIN || "*",
     methods: process.env.CORS_METHODS || "GET,HEAD,PUT,PATCH,POST,DELETE",
   },
-  saltRounds: process.env.SALT_ROUNDS || 10,
+  saltRounds: parseInt(process.env.SALT_ROUNDS || "10"),
   database: process.env.MONGODB_URI,
   port: process.env.PORT || 3000,
   hideLogs: environment === "production",

@@ -12,10 +12,17 @@ module.exports = new passportJWT.Strategy(jwtOptions, function (
   jwtPayload,
   next
 ) {
-  userController.getUser(jwtPayload.id).then(function (user) {
-    if (user) {
-      next(null, user);
-    }
-    next(null, false);
-  });
+  userController
+    .getUser({ id: jwtPayload.id })
+    .then(function (user) {
+      if (user) {
+        next(null, user);
+        return;
+      }
+      next(null, false);
+    })
+    .catch(function (err) {
+      log.error("Ocurrió un error al intentar validar el token", err);
+      next(err);
+    });
 });

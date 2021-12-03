@@ -16,7 +16,6 @@ exports.userValidate = (req, res, next) => {
     convert: false,
   });
 
-  console.log(result);
   if (result.error == null) {
     next();
   } else {
@@ -41,10 +40,12 @@ exports.loginValidate = (req, res, next) => {
     convert: false,
   });
 
-  if (result.error == null) next();
-
-  res.status(code.BAD_REQUEST).json({
-    error: error.USER.DATA_VALIDATION_ERROR,
-    message: "Información de login no cumple con los requisitos del sistema.",
-  });
+  if (result.error == null) {
+    next();
+  } else {
+    res.status(code.BAD_REQUEST).json({
+      error: error.USER.DATA_VALIDATION_ERROR,
+      message: "Información de login no cumple con los requisitos del sistema.",
+    });
+  }
 };

@@ -1,7 +1,6 @@
 const Message = require("./messages.model");
 
 exports.sendMessage = (req, res, next) => {
-  console.log(req.body);
   const { text } = req.body;
   if (!text) {
     return res.status(400).json({ message: "Message can't be empty" });

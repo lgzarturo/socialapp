@@ -47,7 +47,6 @@ function hideFields(user) {
     following: user.following,
     numFollowing: user.following.length - 1,
   };
-  console.info(data);
   return data;
 }
 
@@ -69,47 +68,48 @@ userRouter.get(
 );
 
 userRouter.get(
-  "/whoami",
+  "/me",
   [jwtAuthenticate],
   handleErrors(async (req, res) => {
-    res.json(hideFields(req.user));
+    console.log(req);
+    res.status(code.OK).json(hideFields(req.user));
+    return;
   })
 );
 
-userRouter.get(
-  "/:username",
-  [jwtAuthenticate],
-  handleErrors(async (req, res) => {
-    const { username } = req.params;
-    const user = await userController.getUser({ username }, req.user.id);
+// userRouter.get(
+//   "/:username",
+//   [jwtAuthenticate],
+//   handleErrors(async (req, res) => {
+//     const { username } = req.params;
+//     const user = await userController.getUser({ username }, req.user.id);
 
-    if (!user) {
-      let err = new Error("User not found");
-      err.status = code.NOT_FOUND;
-      throw err;
-    }
-    res.json(hideFields(user));
-  })
-);
+//     if (!user) {
+//       let err = new Error("User not found");
+//       err.status = code.NOT_FOUND;
+//       throw err;
+//     }
+//     res.json(hideFields(user));
+//   })
+// );
 
 userRouter.post(
   "/signup",
   [userValidation, transformEmailToLowercase],
   handleErrors(async (req, res) => {
-    let user = req.body;
+    const user = req.body;
     const userExists = await userController.exists(user.email);
     if (userExists) {
       log.warn(`User with email ${user.email} already exists`);
       throw new UserExistsError();
     }
-    const passwordHashed = await bcrypt.hash(user.password, config.saltRounds);
-    const userCreated = await userController.create(user, passwordHashed);
+    const userCreated = await userController.create(user);
     if (!userCreated) {
       log.error(`Error creating user ${user.email}`);
       throw new Error("User not created");
     }
     res.status(code.CREATED).json({
-      token: createToken(userCreated._id),
+      token: createToken(userCreated),
       user: hideFields(userCreated),
     });
     return;
@@ -120,22 +120,23 @@ userRouter.post(
   "/login",
   [loginValidation, transformEmailToLowercase],
   handleErrors(async (req, res) => {
-    let user = req.body;
-    let userFound = await userController.getUser({ email: user.email });
+    const user = req.body;
+    const userFound = await userController.getUser({ email: user.email });
     if (!userFound) {
       log.warn(`User with email ${user.email} not found`);
       throw new IncorrectCredentialsError();
     }
-    let passwordMatch = await bcrypt.compare(user.password, userFound.password);
+    const passwordMatch = await userFound.isValidPassword(user.password);
     if (!passwordMatch) {
-      log.warn(`User with email ${user.email} not found`);
+      log.warn(`User with email ${user.email} password incorrect`);
       throw new IncorrectCredentialsError();
     }
     log.info(`User with email ${user.email} logged in`);
     res.status(code.OK).json({
-      token: createToken(userFound.id),
+      token: createToken(userFound),
       user: hideFields(userFound),
     });
+    return;
   })
 );
 

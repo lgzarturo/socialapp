@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
-import Axios from 'axios';
 
 import Main from '../components/Main';
 import portraitImage from '../resources/img/portrait-of-amazed-blonde.jpg';
 
-export default function Signup() {
+export default function Signup({ signup }) {
   const [user, setUser] = useState({
     name: 'Arturo Lopez',
-    email: '',
-    password: '',
-    biography: '',
+    email: 'arthurolg@gmail.com',
+    password: '123456',
+    biography: 'sobre mi',
   });
 
   function handleInputChange(event) {
@@ -20,7 +19,7 @@ export default function Signup() {
   async function handleSubmit(event) {
     event.preventDefault();
     try {
-      const { data } = await Axios.post('/api/v1/users/signup', user);
+      const { data } = signup(user);
       console.log(data);
     } catch (e) {
       console.error(e);
@@ -60,6 +59,7 @@ export default function Signup() {
               className="Form__field"
               required
               onChange={handleInputChange}
+              value={user.password}
             />
             <textarea
               name="biography"

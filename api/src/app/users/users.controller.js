@@ -10,10 +10,9 @@ exports.getById = (id) => {
   return User.findById(id);
 };
 
-exports.create = (user, hashedPassword) => {
+exports.create = (user) => {
   return new User({
     ...user,
-    password: hashedPassword,
   }).save();
 };
 
@@ -30,7 +29,7 @@ exports.exists = (email) => {
 };
 
 exports.getUserQuery = (query, authUserId) => {
-  const user = User.findOne(query).populate("followers").populate("followings");
+  const user = User.findOne(query).populate("followers").populate("following");
   if (authUserId && user) {
     user.followers = user.followers.filter((follower) => {
       return follower.id !== authUserId;
