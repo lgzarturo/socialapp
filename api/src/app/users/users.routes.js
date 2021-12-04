@@ -10,6 +10,7 @@ const config = require("../../config");
 const log = require("../../config/logger");
 const userValidation = require("./users.validate").userValidate;
 const loginValidation = require("./users.validate").loginValidate;
+const imageValidation = require("../posts/posts.validate").imageValidate;
 const userController = require("./users.controller");
 const handleErrors = require("../../handler/errors").process;
 const { UserExistsError, IncorrectCredentialsError } = require("./users.error");
@@ -142,10 +143,17 @@ userRouter.post(
 
 userRouter.post(
   "/upload",
-  [jwtAuthenticate],
+  [jwtAuthenticate, imageValidation],
   handleErrors(async (req, res) => {
+    const { user } = req;
+    const filename = `${uuidv4()}.${req.extension}`;
+    const url = await saveImage(req.body, filename);
+    req.user.portrait = url;
+    await user.save();
+    log.info(`User ${user.email} uploaded image: ${url}`);
     res.status(code.OK).json({
       message: "Uploaded",
+      url,
     });
   })
 );

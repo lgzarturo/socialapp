@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Route, Routes, useParams } from 'react-router-dom';
 import Axios from 'axios';
 
 import Nav from './components/Nav';
 import Loading from './components/Loading';
+import Error from './components/Error';
 
 import Signup from './views/Signup';
 import Login from './views/Login';
+import Upload from './views/Upload';
 
 import { getToken, setToken, deleteToken, initAxiosInterceptors } from './helpers/auth';
 import Main from './components/Main';
@@ -14,6 +17,7 @@ initAxiosInterceptors();
 
 export default function App() {
   const [user, setUser] = useState(null);
+  const [error, setError] = useState(null);
   const [loadingUser, setLoadingUser] = useState(true);
 
   useEffect(() => {
@@ -53,6 +57,14 @@ export default function App() {
     deleteToken();
   }
 
+  function showError(error) {
+    setError(error);
+  }
+
+  function hideError() {
+    setError(null);
+  }
+
   if (loadingUser) {
     return (
       <Main center>
@@ -61,12 +73,35 @@ export default function App() {
     );
   }
 
+  console.log(user);
+
   return (
-    <div className="WrapperContainer">
-      <Nav />
-      <Signup signup={handleSignup} />
-      <Login login={handleLogin} />
-      <div>{JSON.stringify(user)}</div>
-    </div>
+    <Router>
+      <Nav user={user} />
+      <Error message={error} click={hideError} />
+      {user ? (
+        <AuthenticatedRoutes showError={showError} />
+      ) : (
+        <AnonymousRoutes login={handleLogin} signup={handleSignup} showError={showError} />
+      )}
+    </Router>
+  );
+}
+
+function AuthenticatedRoutes({ showError }) {
+  return (
+    <Routes>
+      <Route path="/upload" element={<Upload showError={showError} />} />
+      <Route path="/" element={<h1>Aqui esta el feed</h1>} index={true} />
+    </Routes>
+  );
+}
+
+function AnonymousRoutes({ login, signup, showError }) {
+  return (
+    <Routes>
+      <Route path="/login" element={<Login login={login} showError={showError} />} />
+      <Route path="/" element={<Signup signup={signup} showError={showError} />} index={true} />
+    </Routes>
   );
 }

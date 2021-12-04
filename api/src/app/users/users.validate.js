@@ -24,7 +24,7 @@ exports.userValidate = (req, res, next) => {
     res.status(code.BAD_REQUEST).json({
       error: error.USER.DATA_VALIDATION_ERROR,
       message:
-        "Información del usuario no cumple con los requisitos del sistema.",
+        "Para registrarse es necesario llenar todos los campo del formulario de forma correcta.",
     });
   }
 };

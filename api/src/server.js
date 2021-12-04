@@ -18,6 +18,7 @@ const profileController = require("./app/profiles/profiles.controller");
 const exploreController = require("./app/resources/explore.controller");
 
 const userRouter = require("./app/users/users.routes");
+const postRouter = require("./app/posts/posts.routes");
 
 const PUBLIC_DIR = path.join(__dirname, "..", "public");
 const IMAGES_DIR = path.join(PUBLIC_DIR, "images");
@@ -68,6 +69,7 @@ app.use("/images", express.static(IMAGES_DIR));
 
 // Application routes
 app.use("/api/v1/users", userRouter);
+app.use("/api/v1/posts", postRouter);
 
 // API routes (deprecated)
 app.post("/api/v1/explore", exploreController.postExplore);

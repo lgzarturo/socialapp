@@ -3,6 +3,9 @@ exports.codeErrors = {
     ID_NOT_VALID: "DatabaseIdentifierNotValid",
     ID_PARSE_ERROR: "DatabaseParseIdentifiedError",
   },
+  FILE: {
+    INVALID_MIME_TYPE: "FileInvalidMimeType",
+  },
   GENERAL: {
     ERROR: "GeneralErrorStatus",
     PRODUCTION_ERROR: "SomethingWentWrong",

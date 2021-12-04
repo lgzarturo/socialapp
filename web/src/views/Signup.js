@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 import Main from '../components/Main';
 import portraitImage from '../resources/img/portrait-of-amazed-blonde.jpg';
 
-export default function Signup({ signup }) {
+export default function Signup({ signup, showError }) {
   const [user, setUser] = useState({
-    name: 'Arturo Lopez',
-    email: 'arthurolg@gmail.com',
-    password: '123456',
-    biography: 'sobre mi',
+    name: '',
+    email: '',
+    password: '',
+    biography: '',
   });
 
   function handleInputChange(event) {
@@ -19,10 +20,11 @@ export default function Signup({ signup }) {
   async function handleSubmit(event) {
     event.preventDefault();
     try {
-      const { data } = signup(user);
+      const { data } = await signup(user);
       console.log(data);
-    } catch (e) {
-      console.error(e);
+    } catch (error) {
+      console.error(error.response.data.error);
+      showError(error.response.data.message);
     }
   }
 
@@ -72,7 +74,7 @@ export default function Signup({ signup }) {
               Signup
             </button>
             <p className="FormContainer__info">
-              Ya tienes una cuenta? <a href="/login">Inicia sesión</a>
+              Ya tienes una cuenta? <Link to="/login">Inicia sesión</Link>
             </p>
           </form>
         </div>
