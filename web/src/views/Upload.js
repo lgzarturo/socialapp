@@ -94,7 +94,7 @@ function SectionUploadImage({ loading, imageUrl, handleUpload }) {
   if (loading) {
     return <Loading />;
   } else if (imageUrl) {
-    return <img src={imageUrl} alt="Uploaded image" />;
+    return <img src={imageUrl} alt={'Uploaded from website'} />;
   }
 
   return (

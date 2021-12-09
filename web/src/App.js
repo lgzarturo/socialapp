@@ -9,6 +9,7 @@ import Error from './components/Error';
 import Signup from './views/Signup';
 import Login from './views/Login';
 import Upload from './views/Upload';
+import Feed from './views/Feed';
 
 import { getToken, setToken, deleteToken, initAxiosInterceptors } from './helpers/auth';
 import Main from './components/Main';
@@ -92,7 +93,7 @@ function AuthenticatedRoutes({ showError }) {
   return (
     <Routes>
       <Route path="/upload" element={<Upload showError={showError} />} />
-      <Route path="/" element={<h1>Aqui esta el feed</h1>} index={true} />
+      <Route path="/" element={<Feed showError={showError} />} index={true} />
     </Routes>
   );
 }
