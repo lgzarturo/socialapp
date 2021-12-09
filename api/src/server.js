@@ -1,111 +1,111 @@
-require("dotenv").config();
-const path = require("path");
+require('dotenv').config()
+const path = require('path')
 
-const morgan = require("morgan");
-const express = require("express");
-const mongoose = require("mongoose");
-const passport = require("passport");
+const morgan = require('morgan')
+const express = require('express')
+const mongoose = require('mongoose')
+const passport = require('passport')
 
-const passportConfig = require("./config/passport");
-const log = require("./config/logger");
-const config = require("./config");
-const authJWT = require("./libs/auth");
-const errorHandler = require("./handler/errors");
+const passportConfig = require('./config/passport')
+const log = require('./config/logger')
+const config = require('./config')
+const authJWT = require('./libs/auth')
+const errorHandler = require('./handler/errors')
 
-const userController = require("./app/users/users.controller");
-const messageController = require("./app/messages/messages.controller");
-const profileController = require("./app/profiles/profiles.controller");
-const exploreController = require("./app/resources/explore.controller");
+const userController = require('./app/users/users.controller')
+const messageController = require('./app/messages/messages.controller')
+const profileController = require('./app/profiles/profiles.controller')
+const exploreController = require('./app/resources/explore.controller')
 
-const userRouter = require("./app/users/users.routes");
-const postRouter = require("./app/posts/posts.routes");
+const userRouter = require('./app/users/users.routes')
+const postRouter = require('./app/posts/posts.routes')
 
-const PUBLIC_DIR = path.join(__dirname, "..", "public");
-const IMAGES_DIR = path.join(PUBLIC_DIR, "images");
+const PUBLIC_DIR = path.join(__dirname, '..', 'public')
+const IMAGES_DIR = path.join(PUBLIC_DIR, 'images')
 
-let server;
+let server
 
 // Connect to MongoDB
-mongoose.Promise = global.Promise;
+mongoose.Promise = global.Promise
 mongoose.connect(config.database, {
   useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
-mongoose.connection.on("error", (err) => {
-  log.error("Error en la conexión con la base de datos.");
-  throw err;
-});
+  useUnifiedTopology: true
+})
+mongoose.connection.on('error', (err) => {
+  log.error('Error en la conexión con la base de datos.')
+  throw err
+})
 
 // Create Express server
-const app = express();
-app.use(express.json());
-app.use(express.raw({ type: config.typeImage, limit: config.maxImageSize }));
-app.use(express.urlencoded({ extended: true }));
+const app = express()
+app.use(express.json())
+app.use(express.raw({ type: config.typeImage, limit: config.maxImageSize }))
+app.use(express.urlencoded({ extended: true }))
 
 // Logging configuration
 app.use(
   morgan(config.logFormat, {
     stream: {
-      write: (message) => log.info(message.trim()),
-    },
+      write: (message) => log.info(message.trim())
+    }
   })
-);
+)
 
 // Passport configuration
-passport.use(authJWT);
-app.use(passport.initialize());
+passport.use(authJWT)
+app.use(passport.initialize())
 
 // Headers
 app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", config.cors.origin);
-  res.setHeader("Access-Control-Allow-Methods", config.cors.methods);
-  res.setHeader("Access-Control-Allow-Headers", config.cors.headers);
-  next();
-});
+  res.setHeader('Access-Control-Allow-Origin', config.cors.origin)
+  res.setHeader('Access-Control-Allow-Methods', config.cors.methods)
+  res.setHeader('Access-Control-Allow-Headers', config.cors.headers)
+  next()
+})
 
 // Public files
-app.use(express.static(PUBLIC_DIR));
-app.use("/images", express.static(IMAGES_DIR));
+app.use(express.static(PUBLIC_DIR))
+app.use('/images', express.static(IMAGES_DIR))
 
 // Application routes
-app.use("/api/v1/users", userRouter);
-app.use("/api/v1/posts", postRouter);
+app.use('/api/v1/users', userRouter)
+app.use('/api/v1/posts', postRouter)
 
 // API routes (deprecated)
-app.post("/api/v1/explore", exploreController.postExplore);
+app.post('/api/v1/explore', exploreController.postExplore)
 app.post(
-  "/api/v1/follow/:id",
+  '/api/v1/follow/:id',
   passportConfig.isAuthenticated,
   profileController.follow
-);
+)
 app.post(
-  "/api/v1/unfollow/:id",
+  '/api/v1/unfollow/:id',
   passportConfig.isAuthenticated,
   profileController.unfollow
-);
-app.post("/api/v1/signup", userController.signup);
-app.post("/api/v1/login", userController.login);
+)
+app.post('/api/v1/signup', userController.signup)
+app.post('/api/v1/login', userController.login)
 app.post(
-  "/api/v1/message",
+  '/api/v1/message',
   passportConfig.isAuthenticated,
   messageController.sendMessage
-);
+)
 
 // Error handlers
-app.use(errorHandler.databaseErrorHandler);
-app.use(errorHandler.bodySizeErrorHandler);
+app.use(errorHandler.databaseErrorHandler)
+app.use(errorHandler.bodySizeErrorHandler)
 
-if (config.environment === "development") {
-  app.use(errorHandler.developmentErrorHandler);
+if (config.environment === 'development') {
+  app.use(errorHandler.developmentErrorHandler)
   server = app.listen(config.port, () => {
-    log.info(`Aplicación escuchando en el puerto: ${config.port}`);
-  });
+    log.info(`Aplicación escuchando en el puerto: ${config.port}`)
+  })
 } else {
-  app.use(errorHandler.productionErrorHandler);
-  app.listen();
+  app.use(errorHandler.productionErrorHandler)
+  app.listen()
 }
 
 module.exports = {
   app,
-  server,
-};
+  server
+}

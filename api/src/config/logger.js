@@ -1,8 +1,8 @@
-const winston = require("winston");
-const config = require("../config");
+const winston = require('winston')
+const config = require('../config')
 
-const ERROR_LEVEL = "error";
-const DEBUG_LEVEL = "debug";
+const ERROR_LEVEL = 'error'
+const DEBUG_LEVEL = 'debug'
 
 module.exports = new winston.Logger({
   transports: [
@@ -11,7 +11,7 @@ module.exports = new winston.Logger({
       handleExceptions: true,
       json: false,
       colorize: true,
-      prettyPrint: (object) => JSON.stringify(object, null, 2),
-    }),
-  ],
-});
+      prettyPrint: (object) => JSON.stringify(object, null, 2)
+    })
+  ]
+})

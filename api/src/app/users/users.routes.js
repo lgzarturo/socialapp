@@ -1,39 +1,37 @@
-const express = require("express");
-const _ = require("underscore");
-const uuidv4 = require("uuid/v4");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const passport = require("passport");
-const code = require("http-status-codes").StatusCodes;
+const express = require('express')
+const uuidv4 = require('uuid/v4')
+const jwt = require('jsonwebtoken')
+const passport = require('passport')
+const code = require('http-status-codes').StatusCodes
 
-const config = require("../../config");
-const log = require("../../config/logger");
-const userValidation = require("./users.validate").userValidate;
-const loginValidation = require("./users.validate").loginValidate;
-const imageValidation = require("../posts/posts.validate").imageValidate;
-const userController = require("./users.controller");
-const handleErrors = require("../../handler/errors").process;
-const { UserExistsError, IncorrectCredentialsError } = require("./users.error");
-const jwtAuthenticate = passport.authenticate("jwt", { session: false });
+const config = require('../../config')
+const log = require('../../config/logger')
+const userValidation = require('./users.validate').userValidate
+const loginValidation = require('./users.validate').loginValidate
+const imageValidation = require('../posts/posts.validate').imageValidate
+const userController = require('./users.controller')
+const handleErrors = require('../../handler/errors').process
+const { UserExistsError, IncorrectCredentialsError } = require('./users.error')
+const jwtAuthenticate = passport.authenticate('jwt', { session: false })
 
-const userRouter = express.Router();
+const userRouter = express.Router()
 
 function transformEmailToLowercase(req, res, next) {
-  req.body.email && (req.body.email = req.body.email.toLowerCase());
-  next();
+  req.body.email && (req.body.email = req.body.email.toLowerCase())
+  next()
 }
 
 function createToken(user) {
   return jwt.sign(
     {
       id: user._id,
-      email: user.email,
+      email: user.email
     },
     config.jwt.secret,
     {
-      expiresIn: config.jwt.expiresIn,
+      expiresIn: config.jwt.expiresIn
     }
-  );
+  )
 }
 
 function hideFields(user) {
@@ -46,37 +44,36 @@ function hideFields(user) {
     followers: user.followers,
     numFollowers: user.followers.length - 1,
     following: user.following,
-    numFollowing: user.following.length - 1,
-  };
-  return data;
+    numFollowing: user.following.length - 1
+  }
+  return data
 }
 
 userRouter.get(
-  "/",
+  '/',
   handleErrors((req, res) => {
     return userController.getUsers().then((users) => {
-      res.json(users.map(hideFields));
-    });
+      res.json(users.map(hideFields))
+    })
   })
-);
+)
 
 userRouter.get(
-  "/explore",
+  '/explore',
   [jwtAuthenticate],
   handleErrors(async (req, res) => {
     //userController.
   })
-);
+)
 
 userRouter.get(
-  "/me",
+  '/me',
   [jwtAuthenticate],
   handleErrors(async (req, res) => {
-    console.log(req);
-    res.status(code.OK).json(hideFields(req.user));
-    return;
+    console.log(req)
+    return res.status(code.OK).json(hideFields(req.user))
   })
-);
+)
 
 // userRouter.get(
 //   "/:username",
@@ -95,67 +92,65 @@ userRouter.get(
 // );
 
 userRouter.post(
-  "/signup",
+  '/signup',
   [userValidation, transformEmailToLowercase],
   handleErrors(async (req, res) => {
-    const user = req.body;
-    const userExists = await userController.exists(user.email);
+    const user = req.body
+    const userExists = await userController.exists(user.email)
     if (userExists) {
-      log.warn(`User with email ${user.email} already exists`);
-      throw new UserExistsError();
+      log.warn(`User with email ${user.email} already exists`)
+      throw new UserExistsError()
     }
-    const userCreated = await userController.create(user);
+    const userCreated = await userController.create(user)
     if (!userCreated) {
-      log.error(`Error creating user ${user.email}`);
-      throw new Error("User not created");
+      log.error(`Error creating user ${user.email}`)
+      throw new Error('User not created')
     }
-    res.status(code.CREATED).json({
+    return res.status(code.CREATED).json({
       token: createToken(userCreated),
-      user: hideFields(userCreated),
-    });
-    return;
+      user: hideFields(userCreated)
+    })
   })
-);
+)
 
 userRouter.post(
-  "/login",
+  '/login',
   [loginValidation, transformEmailToLowercase],
   handleErrors(async (req, res) => {
-    const user = req.body;
-    const userFound = await userController.getUser({ email: user.email });
+    const user = req.body
+    const userFound = await userController.getUser({ email: user.email })
     if (!userFound) {
-      log.warn(`User with email ${user.email} not found`);
-      throw new IncorrectCredentialsError();
+      log.warn(`User with email ${user.email} not found`)
+      throw new IncorrectCredentialsError()
     }
-    const passwordMatch = await userFound.isValidPassword(user.password);
+    const passwordMatch = await userFound.isValidPassword(user.password)
     if (!passwordMatch) {
-      log.warn(`User with email ${user.email} password incorrect`);
-      throw new IncorrectCredentialsError();
+      log.warn(`User with email ${user.email} password incorrect`)
+      throw new IncorrectCredentialsError()
     }
-    log.info(`User with email ${user.email} logged in`);
-    res.status(code.OK).json({
+    log.info(`User with email ${user.email} logged in`)
+    return res.status(code.OK).json({
       token: createToken(userFound),
-      user: hideFields(userFound),
-    });
-    return;
+      user: hideFields(userFound)
+    })
   })
-);
+)
 
 userRouter.post(
-  "/upload",
+  '/upload',
   [jwtAuthenticate, imageValidation],
   handleErrors(async (req, res) => {
-    const { user } = req;
-    const filename = `${uuidv4()}.${req.extension}`;
-    const url = await saveImage(req.body, filename);
-    req.user.portrait = url;
-    await user.save();
-    log.info(`User ${user.email} uploaded image: ${url}`);
+    const { user } = req
+    const filename = `${uuidv4()}.${req.extension}`
+    const url = await saveImage(req.body, filename)
+    req.user.portrait = url
+    await user.save()
+    log.info(`User ${user.email} uploaded image: ${url}`)
     res.status(code.OK).json({
-      message: "Uploaded",
-      url,
-    });
+      message: 'Uploaded',
+      url
+    })
   })
-);
+)
 
-module.exports = userRouter;
+module.exports = userRouter
