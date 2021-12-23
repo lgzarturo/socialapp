@@ -10,6 +10,7 @@ const userValidation = require('./users.validate').userValidate
 const loginValidation = require('./users.validate').loginValidate
 const imageValidation = require('../posts/posts.validate').imageValidate
 const userController = require('./users.controller')
+const friendController = require('../friends/friends.controller')
 const handleErrors = require('../../handler/errors').process
 const { UserExistsError, IncorrectCredentialsError } = require('./users.error')
 const jwtAuthenticate = passport.authenticate('jwt', { session: false })
@@ -70,7 +71,6 @@ userRouter.get(
   '/me',
   [jwtAuthenticate],
   handleErrors(async (req, res) => {
-    console.log(req)
     return res.status(code.OK).json(hideFields(req.user))
   })
 )
@@ -106,6 +106,7 @@ userRouter.post(
       log.error(`Error creating user ${user.email}`)
       throw new Error('User not created')
     }
+    await friendController.createFriend(userCreated._id, userCreated._id)
     return res.status(code.CREATED).json({
       token: createToken(userCreated),
       user: hideFields(userCreated)

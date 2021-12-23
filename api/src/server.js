@@ -17,8 +17,10 @@ const messageController = require('./app/messages/messages.controller')
 const profileController = require('./app/profiles/profiles.controller')
 const exploreController = require('./app/resources/explore.controller')
 
-const userRouter = require('./app/users/users.routes')
+const friendRouter = require('./app/friends/friends.routes')
+const likeRouter = require('./app/likes/likes.routes')
 const postRouter = require('./app/posts/posts.routes')
+const userRouter = require('./app/users/users.routes')
 
 const PUBLIC_DIR = path.join(__dirname, '..', 'public')
 const IMAGES_DIR = path.join(PUBLIC_DIR, 'images')
@@ -70,6 +72,8 @@ app.use('/images', express.static(IMAGES_DIR))
 // Application routes
 app.use('/api/v1/users', userRouter)
 app.use('/api/v1/posts', postRouter)
+app.use('/api/v1/friends', friendRouter)
+app.use('/api/v1/likes', likeRouter)
 
 // API routes (deprecated)
 app.post('/api/v1/explore', exploreController.postExplore)

@@ -38,7 +38,7 @@ const PostSchema = new Schema(
 )
 
 PostSchema.virtual('comments', {
-  ref: 'comment', // The model to use
+  ref: 'Message', // The model to use
   localField: '_id', // Find people where `localField`
   foreignField: 'post', // is equal to `foreignField`
   // If `justOne` is true, 'members' will be a single doc as opposed to

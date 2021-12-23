@@ -6,20 +6,34 @@ const code = require('http-status-codes').StatusCodes
 const log = require('../../config/logger')
 const imageValidation = require('./posts.validate').imageValidate
 const postCreateValidation = require('./posts.validate').postCreateValidation
-const saveImage = require('./posts.controller').saveImage
-const createPost = require('./posts.controller').createPost
+const {
+  createPost,
+  getPosts,
+  getFeedPost,
+  addLike,
+  getPostByUser,
+  getPostsByUser,
+  saveImage
+} = require('./posts.controller')
 const handleErrors = require('../../handler/errors').process
+const { idValidator } = require('../../libs/mongo')
 const jwtAuthenticate = passport.authenticate('jwt', { session: false })
 
 const postRouter = express.Router()
 
-postRouter.post(
+postRouter.get(
   '/',
-  [jwtAuthenticate, postCreateValidation],
   handleErrors(async (req, res) => {
-    const post = await createPost(req.body, req.user.id)
-    log.info('Post agregada a la colección de posts', post)
-    res.status(code.CREATED).json(post)
+    const posts = await getPosts()
+    return res.status(code.OK).json(posts)
+  })
+)
+
+postRouter.get(
+  '/explore',
+  handleErrors(async (req, res) => {
+    const posts = await getPosts()
+    return res.status(code.OK).json(posts)
   })
 )
 
@@ -29,8 +43,43 @@ postRouter.get(
   handleErrors(async (req, res) => {
     const queryDate = req.query.date || new Date()
     log.info('Obteniendo posts del feed', queryDate)
-    const posts = await req.user.getFeed(req.user.id, queryDate)
-    res.status(code.OK).json(posts)
+    const posts = await getFeedPost(req.user.id, queryDate)
+    return res.status(code.OK).json(posts)
+  })
+)
+
+postRouter.get(
+  '/user/:id',
+  [jwtAuthenticate, idValidator],
+  handleErrors(async (req, res) => {
+    const id = req.params.id
+    log.info(`Obteniendo posts del usuario ${id}`)
+    const posts = await getPostsByUser(id)
+    return res.status(code.OK).json(posts)
+  })
+)
+
+postRouter.get(
+  '/:id',
+  [jwtAuthenticate, idValidator],
+  handleErrors(async (req, res) => {
+    const id = req.params.id
+    log.info(`Obteniendo post ${id}`)
+    const post = await getPostByUser(id, req.user.id)
+    if (!post) {
+      return res.status(code.NOT_FOUND).json({ message: 'Post not found' })
+    }
+    return res.status(code.OK).json(post)
+  })
+)
+
+postRouter.post(
+  '/',
+  [jwtAuthenticate, postCreateValidation],
+  handleErrors(async (req, res) => {
+    const post = await createPost(req.body, req.user.id)
+    log.info('Post agregada a la colección de posts', post)
+    res.status(code.CREATED).json(post)
   })
 )
 

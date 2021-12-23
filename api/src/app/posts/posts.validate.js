@@ -19,7 +19,6 @@ exports.postCreateValidation = (req, res, next) => {
   if (result.error == null) {
     next()
   } else {
-    console.log(result)
     const validationErrors = result.error.details.reduce((data, error) => {
       return data + `[${error.message}]`
     }, '')
